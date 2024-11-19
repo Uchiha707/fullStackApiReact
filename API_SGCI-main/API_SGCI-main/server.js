@@ -3,6 +3,8 @@ const conectarDB = require('./config/db');
 const authRoutes = require('./routes/authRoutes');
 const productosRoutes = require('./routes/productosRoutes'); // Importar rutas de productos
 const pedidosRoutes = require('./routes/pedidosRoutes');  // Importar rutas de pedidos
+const cors = require('cors'); // Importar cors
+const path = require('path'); // Importar path
 
 // Conectar a la base de datos
 conectarDB();
@@ -10,8 +12,23 @@ conectarDB();
 // Crear una instancia de Express
 const app = express();
 
+// Configuración de CORS
+const corsOptions = {
+  origin: 'http://localhost:5173', // Asegúrate que este es el puerto correcto del frontend
+  methods: ['GET', 'POST', 'PUT', 'DELETE'], // Métodos permitidos
+  allowedHeaders: ['Content-Type', 'Authorization'], // Cabeceras permitidas
+  credentials: true, // Habilita el manejo de cookies y otros credenciales
+  optionsSuccessStatus: 200 // Algunos navegadores requieren esta opción para las respuestas OPTIONS
+};
+
+// Usar CORS en el servidor con las opciones configuradas
+app.use(cors(corsOptions));
+
 // Middleware para analizar el cuerpo de las solicitudes
 app.use(express.json());
+
+// Middleware para servir archivos estáticos desde el directorio 'uploads'
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Usar rutas de autenticación
 app.use('/api/auth', authRoutes);
@@ -26,4 +43,8 @@ app.use('/api', pedidosRoutes);  // Usar rutas de pedidos
 const PORT = 5000;
 app.listen(PORT, () => {
   console.log(`Servidor corriendo en el puerto ${PORT}`);
-}); 
+});
+
+
+
+
